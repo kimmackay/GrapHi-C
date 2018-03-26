@@ -3,6 +3,9 @@ GrapHi-C: graph-based visualization of Hi-C data
 
 generate_adjacency_graph.pl is the script used to generate an adjacency graph from Hi-C data where: linear, cis and trans interactions are represented
 
+
+*** Caution: depending on what network layout you choose to use you will want the above script to output either the direct interaction frequency or the inverse of the interaction frequency. Be mindful of your selection to insure the inverse of the interaction frequency is represented in the final layout. ***
+
 ------------------------------------------------------------------------------------------
 
 Example command line for Cytoscape Visualization:
