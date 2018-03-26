@@ -148,8 +148,15 @@ for(my $row = 1; $row <= $#hic_matrix; $row++)
 			## if it is a cytoscape visualization
 			if($viz_tool eq "C")
 			{
-				## store the inverse of the (potentially scaled) interaction frequency 
-				$frequencies[$row][$col] = 1/($matrix_line[$col]*$scale);
+				## store the inverse of the (potentially scaled) interaction frequency
+				if($matrix_line[$col] != 0)
+				{
+					$frequencies[$row][$col] = 1/($matrix_line[$col]*$scale);
+				}
+				else
+				{
+					$frequencies[$row][$col] = 0;
+				}
 			}
 			## if it is a gephi visualization
 			elsif($viz_tool eq "G")
