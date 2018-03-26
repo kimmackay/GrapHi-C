@@ -7,8 +7,11 @@
 ## argument 3: number of chromosomes
 ## argument 4: the value you would like to use to define a linear interaction frequency (experimental resolution)
 ## argument 5: a value to scale the interaction frequencies from the whole-genome contact map (enter 1 if you wish to not scale the values)
+## argument 6: 'C' or 'G' to specify cytoscape or gephi visualization
+## argument 7: the output file name
 ##
-## Kimberly MacKay February 21, 2017
+## Kimberly MacKay 
+## last updated: March 23, 2017
 ## license: This work is licensed under the Creative Commons Attribution-NonCommercial-
 ## ShareAlike 3.0 Unported License. To view a copy of this license, visit 
 ## http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 
@@ -17,8 +20,8 @@
 use strict;
 use warnings;
 
-## check to ensure six arguments were passed in
-die "ERROR: must pass in six arguments." if @ARGV != 6;
+## check to ensure seven arguments were passed in
+die "ERROR: must pass in seven arguments." if @ARGV != 7;
 
 my $hic_file = $ARGV[0];
 my $num_nodes = $ARGV[1];
@@ -30,8 +33,11 @@ my $linear_freq = $ARGV[3];
 ## value to scale the interaction frequencies by
 my $scale = $ARGV[4];
 
+## determine the visualization tool to be used
+my $viz_tool = $ARGV[5];
+
 ## get the output file name
-my $out_file_name =  $ARGV[5];
+my $out_file_name =  $ARGV[6];
 
 ## get the values for the start and end of each chromsome from the user
 my @chr_start;
@@ -78,14 +84,31 @@ die "ERROR: the number of chromsome start and end positions should be equal." if
 open(my $out, '>', $out_file_name) or die "Could not open $out_file_name";
 
 ## print the first line of the output file
-print $out "source_node\tsink_node\tinteraction_type\tassociated_freq\tsource_chr\tsink_chr\tlinear_edge_chr\n";
+## if it is for a cytoscape visualization, print out a different header line then the header required for Gephi visualization
+if($viz_tool eq "C")
+{
+	print $out "source_node\tsink_node\tinteraction_type\tassociated_freq\tsource_chr\tsink_chr\tlinear_edge_chr\n";
+}
+elsif($viz_tool eq "G")
+{
+	print $out "Source\tTarget\tinteraction_type\tWeight\n";
+}
 
 ## for each chromosome
 for(my $chr = 1; $chr <= $num_chr; $chr++)
 {
 	for(my $j = $chr_start[$chr-1]; $j < $chr_stop[$chr-1]; $j++)
 	{	
-		print $out "bin".$j."\tbin".($j+1)."\tlinear\t".$linear_freq."\t".$chr."\t".$chr."\t".$chr."\n";
+		## if it is a cytoscape visualization, print out the inverse of the linear frequency and relevant information
+		if($viz_tool eq "C")
+		{
+			print $out "bin".$j."\tbin".($j+1)."\tlinear\t".1/$linear_freq."\t".$chr."\t".$chr."\t".$chr."\n";
+		}
+		## if it is a gephi visualization, just print out the linear frequency (it will be inversed by the force atlas 2 layout) and relavent information
+		elsif($viz_tool eq "G")
+		{
+			print $out $j."\t".($j+1)."\tlinear".$chr."\t".$linear_freq."\n";	
+		}
 	}
 
 }
@@ -122,8 +145,18 @@ for(my $row = 1; $row <= $#hic_matrix; $row++)
 		}
 		else
 		{
-			## convert it to a scaled integer
-			$frequencies[$row][$col] = int($matrix_line[$col]*$scale);
+			## if it is a cytoscape visualization
+			if($viz_tool eq "C")
+			{
+				## store the inverse of the (potentially scaled) interaction frequency 
+				$frequencies[$row][$col] = 1/($matrix_line[$col]*$scale);
+			}
+			## if it is a gephi visualization
+			elsif($viz_tool eq "G")
+			{
+				## just store the (potentially scaled) interaction frequency
+				$frequencies[$row][$col] = $matrix_line[$col]*$scale;
+			}
 		}
 	}
 }
@@ -170,12 +203,30 @@ for(my $row = 1; $row <= $#frequencies; $row++)
 			if($source_chr == $sink_chr)
 			{
 				## print the intra-interaction
-				print $out "bin".$row."\tbin".$col."\tintra-interaction\t".$frequencies[$row][$col]."\t".$source_chr."\t".$sink_chr."\t0\n";
+				## if it is a cytoscape visualization
+				if($viz_tool eq "C")
+				{	
+					print $out "bin".$row."\tbin".$col."\tintra-interaction\t".$frequencies[$row][$col]."\t".$source_chr."\t".$sink_chr."\t0\n";
+				}
+				## if it is a gephi visualization
+				elsif($viz_tool eq "G")
+				{
+					print $out $row."\t".$col."\tintra-interaction\t".$frequencies[$row][$col]."\n";
+				}
 			}
 			else
 			{
 				## print the inter-interaction
-				print $out "bin".$row."\tbin".$col."\tinter-interaction\t".$frequencies[$row][$col]."\t".$source_chr."\t".$sink_chr."\t0\n";
+				## if it is a cytoscape visualization
+				if($viz_tool eq "C")
+				{
+					print $out "bin".$row."\tbin".$col."\tinter-interaction\t".$frequencies[$row][$col]."\t".$source_chr."\t".$sink_chr."\t0\n";
+				}
+				## if it is a gephi visualization
+				elsif($viz_tool eq "G")
+				{
+					print $out $row."\t".$col."\tinter-interaction\t".$frequencies[$row][$col]."\n";
+				}	
 			}
 		}
 	}
