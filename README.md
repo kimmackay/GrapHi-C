@@ -1,6 +1,8 @@
 # GrapHi-C
 GrapHi-C: graph-based visualization of Hi-C data
 
+If you use this method, please cite: Kimberly MacKay, Anthony Kusalik and Christopher H. Eskiw. GrapHi-C: graph-based visualization of Hi-C datasets. BMC Research Notes. (2018) 11:418. DOI: https://doi.org/10.1186/s13104-018-3507-2
+
 generate_adjacency_graph.pl is the script used to generate an adjacency graph from Hi-C data where: linear, cis and trans interactions are represented
 
 So far, GrapHi-C has been tested with output from the hiclib pipeline form Mirny Lab (https://bitbucket.org/mirnylab/hiclib)
