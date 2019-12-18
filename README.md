@@ -9,11 +9,15 @@ So far, GrapHi-C has been tested with output from the hiclib pipeline form Mirny
 
 *** Caution: depending on what network layout you choose to use you will want the above script to output either the direct interaction frequency or the inverse of the interaction frequency. Be mindful of your selection to insure the inverse of the interaction frequency is represented in the final layout. ***
 
+
+the first row/column of the whole-genome contact map should include the information for bin labels and/or chromsome locations
+
 ------------------------------------------------------------------------------------------
+Whole-genome example:
 
 Example command line for Cytoscape Visualization:
 
-./generate_adjacency_graph.pl GSM1379427_wt_999a-corrected-matrix_hic2.tsv  1258 3 10000 1 C 999a_wt.tsv
+./generate_adjacency_graph.pl GSM1379427_wt_999a-corrected-matrix_hic.tsv  1258 3 10000 1 C 999a_wt.tsv
 enter the starting genomic bin number for each chromosome. Enter d when complete: 1
 559
 1013
@@ -35,6 +39,21 @@ enter the ending genomic bin number for each chromosome. Enter d when complete: 
 1012
 1258
 d
+
+------------------------------------------------------------------------------------------
+
+A second script has also been developed for single chromosome visualization (generate_adjacency_graph_single_chr.pl). The script only considers linear and cis- interaction data. Please note, GrapHi-C was not intended for the visualization of single-chromosomes since it relies heavily on both cis- and trans- interactions to determine the final layout. The minimal testing that I have done in S. pombe does not yield good results. Note, I have not tested it extensively and should be used with caution. The minimal testing that Please log any issues you incounter in the git repository and I will fix them as soon as possible.
+
+
+Example command line for Cytoscape Visualization:
+
+./generate_adjacency_graph_single_chr.pl ./test_data/single_chr/pombeWT_chr1.txt 558 1 10000 1 C pombeWT_chr1.tsv
+
+
+
+Example command line for Gephi Visualization:
+
+./generate_adjacency_graph_single_chr.pl ./test_data/single_chr/pombeWT_chr1.txt 558 1 10000 1 G pombeWT_chr1.tsv
 
 ------------------------------------------------------------------------------------------
 
